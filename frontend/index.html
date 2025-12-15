@@ -1,268 +1,249 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <title>Dashboard de Casos</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      background-color: #f5f7fa;
-    }
-    .filtros {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 15px;
-      margin-bottom: 20px;
-      padding: 15px;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    .filtros label {
-      font-weight: bold;
-      color: #40516c;
-    }
-    .container {
-      display: flex;
-      gap: 20px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-bottom: 20px;
-    }
-    .grafico-box {
-      flex: 1 1 400px;
-      max-width: 45vw;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background: white;
-      padding: 15px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    .grafico-box.rosca {
-      max-width: 320px;
-    }
-    #graficoRosca {
-      width: 100% !important;
-      height: auto !important;
-      max-height: 320px !important;
-      display: block;
-    }
-    #graficoDistribuicao {
-      width: 100% !important;
-      height: 300px !important;
-    }
-
-    .container-modelo-predicao {
-      display: flex;
-      gap: 20px;
-      justify-content: center;
-      align-items: flex-start;
-      margin-bottom: 20px;
-      width: 90%;
-      max-width: 1200px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    #containerGraficoModelo {
-      margin: 40px auto;
-      width: 90%;
-      max-width: 800px;
-      height: 400px;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-    }
-
-    #containerGraficoModelo h3 {
-      text-align: center;
-      margin: 0 0 20px 0;
-      color: #40516c;
-      font-size: 1.3em;
-    }
-
-    .box-predicao {
-      flex: 0 1 320px;
-      max-width: 320px;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      padding: 20px;
-      margin-top: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .box-predicao h2 {
-      color: #40516c;
-      margin-bottom: 15px;
-      font-size: 1.2em;
-      text-align: center;
-    }
-    .box-predicao form {
-      width: 100%;
-    }
-    .box-predicao label {
-      font-weight: bold;
-      color: #40516c;
-    }
-    .box-predicao input[type="number"] {
-      width: 100%;
-      margin-bottom: 10px;
-    }
-    .box-predicao button {
-      width: 100%;
-      padding: 8px 0;
-      background: #40516c;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-    .box-predicao #resultado {
-      margin-top: 15px;
-      font-size: 1.1em;
-      color: #40516c;
-      text-align: center;
-      min-height: 24px;
-    }
-
-    h1 {
-      text-align: center;
-      color: #40516c;
-      margin-bottom: 30px;
-    }
-
-    h2 {
-      color: #40516c;
-      margin-bottom: 15px;
-      font-size: 1.2em;
-    }
-
-    select, input[type="date"] {
-      padding: 8px 12px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      background-color: #f9f9f9;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Dashboard Bombeiros PE</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background: #f0f2f5;
+            padding: 20px;
+            color: #333;
+        }
+        
+        h1, h2, h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .filtros {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .filtros-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .filtro-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .filtro-group label {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        input, select, button {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        button:hover {
+            background: #2980b9;
+        }
+        
+        .graficos-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .grafico-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .grafico-box h3 {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        canvas {
+            max-height: 300px;
+        }
+        
+        .form-container {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .form-group label {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .resultado {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f4fc;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .resultado h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .resultado p {
+            margin: 5px 0;
+        }
+    </style>
 </head>
 <body>
-  <h1>Dashboard de Ocorrências do Corpo de Bombeiros</h1>
-
-  <div class="filtros">
-    <label for="dataInicio">Período de:</label>
-    <input type="date" id="dataInicio" />
-    <label for="dataFim">até:</label>
-    <input type="date" id="dataFim" />
-  </div>
-
-  <div class="container">
-    <div class="grafico-box rosca">
-      <div class="rosca-controls">
-        <label for="variavelRosca">Variável:</label>
-        <select id="variavelRosca">
-          <option value="tipo_do_caso">Tipo do Caso</option>
-          <option value="localizacao">Localização</option>
-          <option value="vitima.etnia">Etnia da Vítima</option>
-        </select>
-      </div>
-      <canvas id="graficoRosca"></canvas>
+    <div class="container">
+        <div class="header">
+            <h1> Dashboard de Ocorrências - Bombeiros PE</h1>
+            <p>Análise e previsão de ocorrências em Pernambuco</p>
+        </div>
+        
+        <div class="filtros">
+            <h3>Filtrar Ocorrências</h3>
+            <div class="filtros-row">
+                <div class="filtro-group">
+                    <label>Data Início:</label>
+                    <input type="date" id="dataInicio">
+                </div>
+                <div class="filtro-group">
+                    <label>Data Fim:</label>
+                    <input type="date" id="dataFim">
+                </div>
+                <div class="filtro-group">
+                    <label>Local:</label>
+                    <select id="filtroLocal">
+                        <option value="">Todos</option>
+                    </select>
+                </div>
+                <div class="filtro-group">
+                    <label>Tipo:</label>
+                    <select id="filtroTipo">
+                        <option value="">Todos</option>
+                    </select>
+                </div>
+                <button onclick="carregarDados()">Filtrar</button>
+            </div>
+        </div>
+        
+        <div class="graficos-container">
+            <div class="grafico-box">
+                <h3>📊 Tipos de Ocorrência</h3>
+                <canvas id="graficoRosca"></canvas>
+            </div>
+            
+          
+            <div class="grafico-box">
+                <h3>📍 Distribuição por Região</h3>
+                <canvas id="graficoRegiao"></canvas>
+            </div>
+            
+            <div class="grafico-box">
+                <h3> Importância das Variáveis (XGBoost)</h3>
+                <canvas id="graficoImportancia"></canvas>
+            </div>
+        </div>
+        
+        <div class="form-container">
+            <h3>➕ Cadastrar Nova Ocorrência</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Data:</label>
+                    <input type="date" id="cadData" required>
+                </div>
+                <div class="form-group">
+                    <label>Horário (HH:MM):</label>
+                    <input type="time" id="cadHorario" required>
+                </div>
+                <div class="form-group">
+                    <label>Local:</label>
+                    <select id="cadLocal" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Tipo:</label>
+                    <select id="cadTipo" required></select>
+                </div>
+            </div>
+            <button onclick="cadastrarOcorrencia()">Cadastrar Ocorrência</button>
+            
+            <div style="margin: 30px 0; border-top: 2px solid #eee; padding-top: 20px;">
+                <h3>🔮 Prever Tipo de Ocorrência</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Local:</label>
+                        <select id="predLocal" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Horário (HH:MM):</label>
+                        <input type="time" id="predHorario" required>
+                    </div>
+                </div>
+                <button onclick="fazerPrevisao()">Prever Tipo de Caso</button>
+                <div class="resultado" id="resultadoPrevisao" style="display: none;">
+                    <h4>Resultado da Previsão:</h4>
+                    <p id="textoPrevisao"></p>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="grafico-box">
-      <h2>Distribuição de Idade das Vítimas</h2>
-      <canvas id="graficoDistribuicao"></canvas>
-    </div>
-  </div>
-
-  <div class="container-modelo-predicao">
-    <div id="containerGraficoModelo">
-      <h3>Fatores Determinantes nos Tipos de Ocorrência</h3>
-      <canvas id="graficoModelo"></canvas>
-    </div>
-    <div class="box-predicao">
-      <h2>Prever Tipo de Ocorrência</h2>
-      <form id="form-predizer">
-        <label>Etnia:</label>
-        <div id="etniaRadios"></div><br>
-        <label>Localização:</label>
-        <div id="localizacaoRadios"></div><br>
-        <label for="idade">Idade:</label>
-        <input type="number" id="idade" name="idade" min="1" max="120" required><br><br>
-        <button type="submit">Prever</button>
-      </form>
-      <div id="resultado"></div>
-    </div>
-  </div>
-
-  <script>
-    let dadosCasos = [];
-    let graficoRosca = null;
-    let graficoDistribuicao = null;
-    let graficoModelo = null;
-
-    const gradiente = [
-      '#40516c', '#4a5d7c', '#53698c', '#5d759c',
-      '#6b82a7', '#7b90b1', '#8b9dba'
-    ];
-
-    async function carregarDados() {
-      try {
-        const res = await fetch("http://localhost:5000/api/casos");
-        dadosCasos = await res.json();
-        atualizarGraficos();
-        inicializarGraficoModelo();
-      } catch (erro) {
-        console.error("Erro ao carregar dados:", erro);
-        alert("Não foi possível carregar os dados.");
-      }
-    }
-
-    function filtrarPorData(casos) {
-      const inicio = document.getElementById('dataInicio').value;
-      const fim = document.getElementById('dataFim').value;
-
-      return casos.filter(caso => {
-        if (!caso.data_do_caso) return false;
-        const data = new Date(caso.data_do_caso);
-        const dataInicio = inicio ? new Date(inicio) : null;
-        const dataFim = fim ? new Date(fim) : null;
-        return (!dataInicio || data >= dataInicio) && (!dataFim || data <= dataFim);
-      });
-    }
-
-    function contarOcorrencias(dados, chave) {
-      const contagem = {};
-      dados.forEach(caso => {
-        try {
-          const valor = chave.includes('.')
-            ? chave.split('.').reduce((o, k) => o && o[k], caso)
-            : caso[chave];
-          if (valor !== undefined && valor !== null) {
-            contagem[valor] = (contagem[valor] || 0) + 1;
-          }
-        } catch {}
-      });
-      return contagem;
-    }
-
-    function atualizarGraficoRosca(dadosFiltrados, variavel) {
-      const contagem = contarOcorrencias(dadosFiltrados, variavel);
-      const labels = Object.keys(contagem);
-      const valores = Object.values(contagem);
-    }
+    <script src="script.js"></script>
+</body>
+</html>

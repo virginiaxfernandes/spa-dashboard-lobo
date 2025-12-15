@@ -11,29 +11,26 @@ dados = [
     {"local": "Centro", "horario": "22:10", "tipo": "Acidente doméstico"}
 ]
 
-
 df = pd.DataFrame(dados)
 
-
-df['minuto'] = df['horario'].apply(lambda x: int(x.split(':')[1]))  
-
-
-df = df[["local", "horario", "minuto", "tipo"]]  
+df['horario_minutos'] = df['horario'].apply(
+    lambda x: int(x.split(':')[0]) * 60 + int(x.split(':')[1])
+)
 
 le_local = LabelEncoder()
 le_tipo = LabelEncoder()
 
-df["local"] = le_local.fit_transform(df["local"])
-y = le_tipo.fit_transform(df["tipo"])
+df['local_enc'] = le_local.fit_transform(df['local'])
+y = le_tipo.fit_transform(df['tipo'])
 
-X = df[["local", "horario", "minuto"]]  
+X = df[['local_enc', 'horario_minutos']]
 
 modelo = XGBClassifier(
     n_estimators=100,
     max_depth=4,
     learning_rate=0.1,
-    objective="multi:softprob",
-    eval_metric="mlogloss",
+    objective='multi:softmax',
+    eval_metric='mlogloss',
     random_state=42
 )
 
@@ -44,7 +41,8 @@ with open("model.pkl", "wb") as f:
         "modelo": modelo,
         "le_local": le_local,
         "le_tipo": le_tipo,
-        "features": X.columns.tolist()
+        "feature_names": ['Local', 'Horário'],
+        "importancias": modelo.feature_importances_.tolist()
     }, f)
 
-print("Modelo XGBoost treinado e salvo com sucesso!")
+print(" Modelo XGBoost treinado e salvo com sucesso!")
