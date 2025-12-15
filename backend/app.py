@@ -7,10 +7,11 @@ import pickle
 import os
 import pandas as pd
 
+from sklearn.preprocessing import LabelEncoder
+from xgboost import XGBClassifier
+
 app = Flask(__name__)
 CORS(app)
-
-from pymongo import MongoClient
 
 MONGO_URI = "mongodb+srv://virginiaxfernandes:2225@meu-banco.7vhz77c.mongodb.net/bombeiros_db?retryWrites=true&w=majority"
 
@@ -57,6 +58,10 @@ def popular_banco():
 
 popular_banco()
 
+def horario_para_minutos(horario):
+    h, m = horario.split(":")
+    return int(h) * 60 + int(m)
+
 
 def carregar_modelo():
     if not os.path.exists(MODEL_PATH):
@@ -65,9 +70,51 @@ def carregar_modelo():
         return pickle.load(f)
 
 
-def horario_para_minutos(horario):
-    h, m = horario.split(":")
-    return int(h) * 60 + int(m)
+def treinar_modelo():
+    dados = list(colecao.find({}, {"_id": 0}))
+
+    if len(dados) < 10:
+        print("Dados insuficientes para treinar o modelo")
+        return
+
+    df = pd.DataFrame(dados)
+
+    df["horario_min"] = df["horario"].apply(horario_para_minutos)
+
+    le_local = LabelEncoder()
+    le_tipo = LabelEncoder()
+
+    df["local_enc"] = le_local.fit_transform(df["local"])
+    df["tipo_enc"] = le_tipo.fit_transform(df["tipo"])
+
+    X = df[["local_enc", "horario_min"]]
+    y = df["tipo_enc"]
+
+    modelo = XGBClassifier(
+        n_estimators=100,
+        max_depth=4,
+        learning_rate=0.1,
+        objective="multi:softmax",
+        eval_metric="mlogloss",
+        random_state=42
+    )
+
+    modelo.fit(X, y)
+
+    with open(MODEL_PATH, "wb") as f:
+        pickle.dump({
+            "modelo": modelo,
+            "le_local": le_local,
+            "le_tipo": le_tipo,
+            "importancias": modelo.feature_importances_.tolist(),
+            "feature_names": ["Local", "Horário"]
+        }, f)
+
+    print(" Modelo treinado e salvo com sucesso!")
+
+
+if not os.path.exists(MODEL_PATH):
+    treinar_modelo()
 
 @app.route("/api/opcoes")
 def opcoes():
@@ -127,19 +174,12 @@ def estatisticas():
 
     modelo_data = carregar_modelo()
 
-    if modelo_data:
-        importancias = modelo_data.get("importancias", [])
-        nomes = modelo_data.get("feature_names", [])
-    else:
-        importancias = []
-        nomes = []
-
     return jsonify({
         "tipos": contagem_tipos,
         "regioes": contagem_regioes,
         "importancia": {
-            "nomes": nomes,
-            "valores": importancias
+            "nomes": modelo_data["feature_names"],
+            "valores": modelo_data["importancias"]
         }
     })
 
@@ -148,31 +188,26 @@ def estatisticas():
 def predizer():
     modelo_data = carregar_modelo()
     if not modelo_data:
-        return jsonify({"erro": "Modelo não encontrado. Execute train_model.py"}), 500
+        return jsonify({"erro": "Modelo não encontrado"}), 500
 
     dados = request.json
 
     if not all(k in dados for k in ["local", "horario"]):
         return jsonify({"erro": "Informe local e horário"}), 400
 
-    try:
-        local_enc = modelo_data["le_local"].transform([dados["local"]])[0]
-        horario_min = horario_para_minutos(dados["horario"])
+    local_enc = modelo_data["le_local"].transform([dados["local"]])[0]
+    horario_min = horario_para_minutos(dados["horario"])
 
-        X = [[local_enc, horario_min]]
-        pred = modelo_data["modelo"].predict(X)[0]
+    X = [[local_enc, horario_min]]
+    pred = modelo_data["modelo"].predict(X)[0]
 
-        tipo_previsto = modelo_data["le_tipo"].inverse_transform([pred])[0]
+    tipo_previsto = modelo_data["le_tipo"].inverse_transform([pred])[0]
 
-        return jsonify({
-            "previsao": tipo_previsto,
-            "importancia": modelo_data["importancias"]
-        })
+    return jsonify({
+        "previsao": tipo_previsto,
+        "importancia": modelo_data["importancias"]
+    })
 
-    except Exception as e:
-        return jsonify({"erro": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-
