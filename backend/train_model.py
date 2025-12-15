@@ -1,32 +1,32 @@
-from pymongo import MongoClient
 import pandas as pd
-import pickle
 from sklearn.preprocessing import LabelEncoder
 from xgboost import XGBClassifier
+import pickle
 
-MONGO_URI = "mongodb+srv://virginiaxfernandes:2225@meu-banco.7vhz77c.mongodb.net/bombeiros_db?retryWrites=true&w=majority"
-client = MongoClient(MONGO_URI)
-db = client["bombeiros_db"]
-colecao = db["ocorrencias"]
+dados = [
+    {"local": "Centro", "horario": "14:30", "tipo": "Acidente de Trânsito"},
+    {"local": "Zona Norte", "horario": "08:15", "tipo": "Incêndio"},
+    {"local": "Zona Sul", "horario": "19:40", "tipo": "Resgate"},
+    {"local": "Zona Sul", "horario": "06:05", "tipo": "Enchente"},
+    {"local": "Centro", "horario": "22:10", "tipo": "Acidente doméstico"}
+]
 
-dados = list(colecao.find({}, {"_id": 0}))
-
-if not dados:
-    raise Exception("Banco de dados vazio. Gere dados antes de treinar.")
 
 df = pd.DataFrame(dados)
 
-df = df[["local", "horario", "minuto", "tipo"]]
 
-y = df["tipo"]
+df['minuto'] = df['horario'].apply(lambda x: int(x.split(':')[1]))  
+
+
+df = df[["local", "horario", "minuto", "tipo"]]  
 
 le_local = LabelEncoder()
 le_tipo = LabelEncoder()
 
 df["local"] = le_local.fit_transform(df["local"])
-y = le_tipo.fit_transform(y)
+y = le_tipo.fit_transform(df["tipo"])
 
-X = df[["local", "horario", "minuto"]]
+X = df[["local", "horario", "minuto"]]  
 
 modelo = XGBClassifier(
     n_estimators=100,
