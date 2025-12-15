@@ -46,7 +46,7 @@ def gerar_dados(n=20):
             "data": (hoje - timedelta(days=random.randint(0, 365))).strftime("%Y-%m-%d"),
             "tipo": random.choice(TIPOS_CASOS),
             "local": random.choice(LOCAIS),
-            "horario": random.randint(1, 90)
+            "horario": random.randint(0, 23)
         })
 
     return dados
