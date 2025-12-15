@@ -62,13 +62,21 @@ def validar_caso_json(data):
         return False
     return True
 
-def gerar_dados_aleatorios(n=20):
-    tipos_casos = ["Furto", "Assalto", "Violência doméstica", "Tráfico"]
-    locais = ["Centro", "Bairro A", "Bairro B", "Zona Rural"]
+ddef gerar_dados_aleatorios(n=20):
+    tipos_casos = [
+        "Incêndio",
+        "Resgate",
+        "Acidente de Trânsito",
+        "Enchente",
+        "Acidente doméstico"
+    ]
+    locais = ["Centro", "Zona Urbana", "Zona Rural", "Rodovia"]
     etnias = ["Branca", "Preta", "Parda", "Indígena", "Amarela"]
+
     casos = []
     base_date = datetime.now()
-    for i in range(n):
+
+    for _ in range(n):
         data_caso = (base_date - timedelta(days=random.randint(0, 365))).date().isoformat()
         caso = Caso(
             data_do_caso=data_caso,
@@ -80,6 +88,7 @@ def gerar_dados_aleatorios(n=20):
             )
         )
         casos.append(caso.to_dict())
+
     return casos
 
 @app.route('/api/casos', methods=['GET'])
