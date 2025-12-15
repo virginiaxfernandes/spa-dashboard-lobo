@@ -10,15 +10,7 @@ import pandas as pd
 app = Flask(__name__)
 CORS(app)
 
-from flask import Flask
-from flask_cors import CORS
-from pymongo import MongoClient
-
-app = Flask(__name__)
-CORS(app)
-
 MONGO_URI = "mongodb+srv://virginiaxfernandes:2225@meu-banco.7vhz77c.mongodb.net/bombeiros_db?retryWrites=true&w=majority"
-
 client = MongoClient(MONGO_URI)
 db = client["bombeiros_db"]
 colecao = db["ocorrencias"]
@@ -37,22 +29,26 @@ LOCAIS = [
     "Zona Sul"
 ]
 
-def gerar_dados(n=20):
+
+def gerar_dados(n=30):
     dados = []
     hoje = datetime.now()
 
     for _ in range(n):
+        hora = random.randint(0, 23)
+        minuto = random.randint(0, 59)
+
         dados.append({
             "data": (hoje - timedelta(days=random.randint(0, 365))).strftime("%Y-%m-%d"),
             "tipo": random.choice(TIPOS_CASOS),
             "local": random.choice(LOCAIS),
-            "horario": random.randint(0, 23)
+            "horario": f"{hora:02d}:{minuto:02d}"
         })
 
     return dados
 
 if colecao.count_documents({}) == 0:
-    colecao.insert_many(gerar_dados(30))
+    colecao.insert_many(gerar_dados())
 
 @app.route("/api/casos")
 def listar_casos():
@@ -78,5 +74,6 @@ def predizer():
 
     return jsonify({"previsao": previsao})
 
-app.run(debug=True)
+if __name__ == "__main__":
+    app.run(debug=True)
 
