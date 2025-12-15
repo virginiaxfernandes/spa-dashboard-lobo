@@ -10,7 +10,16 @@ import pandas as pd
 app = Flask(__name__)
 CORS(app)
 
-client = MongoClient("mongodb://localhost:27017/")
+from flask import Flask
+from flask_cors import CORS
+from pymongo import MongoClient
+
+app = Flask(__name__)
+CORS(app)
+
+MONGO_URI = "mongodb+srv://virginiaxfernandes:2225@meu-banco.7vhz77c.mongodb.net/bombeiros_db?retryWrites=true&w=majority"
+
+client = MongoClient(MONGO_URI)
 db = client["bombeiros_db"]
 colecao = db["ocorrencias"]
 
