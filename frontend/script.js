@@ -1,12 +1,14 @@
 let graficoRosca, graficoRegiao, graficoImportancia;
 
+const API_BASE = "https://effective-potato-694g4rx4pqgwh57qx-5000.app.github.dev";
+
 const cores = [
     '#3498db', '#2ecc71', '#e74c3c',
     '#f39c12', '#9b59b6', '#1abc9c'
 ];
 
 async function carregarOpcoes() {
-    const res = await fetch('http://localhost:5000/api/opcoes');
+    const res = await fetch(`${API_BASE}/api/opcoes`);
     const dados = await res.json();
 
     preencherSelect('filtroLocal', dados.locais, true);
@@ -16,7 +18,7 @@ async function carregarOpcoes() {
     preencherSelect('predLocal', dados.locais);
 }
 
-function preencherSelect(id, valores, todos=false) {
+function preencherSelect(id, valores, todos = false) {
     const select = document.getElementById(id);
     select.innerHTML = `<option value="">${todos ? 'Todos' : 'Selecione'}</option>`;
     valores.forEach(v => {
@@ -33,12 +35,12 @@ async function carregarDados() {
     if (filtroTipo.value) params.append('tipo', filtroTipo.value);
 
     const url = params.toString()
-        ? `http://localhost:5000/api/casos?${params}`
-        : `http://localhost:5000/api/casos`;
+        ? `${API_BASE}/api/casos?${params}`
+        : `${API_BASE}/api/casos`;
 
-    await fetch(url); // apenas para aplicar filtro no backend
+    await fetch(url);
 
-    const res = await fetch('http://localhost:5000/api/estatisticas');
+    const res = await fetch(`${API_BASE}/api/estatisticas`);
     const stats = await res.json();
 
     grafico('graficoRosca', stats.tipos, 'doughnut');
@@ -76,7 +78,9 @@ function graficoImportanciaFn(dados) {
                 backgroundColor: '#2ecc71'
             }]
         },
-        options: { indexAxis: 'y' }
+        options: {
+            indexAxis: 'y'
+        }
     });
 }
 
@@ -88,20 +92,22 @@ async function cadastrarOcorrencia() {
         tipo: cadTipo.value
     };
 
-    const res = await fetch('http://localhost:5000/api/casos', {
+    const res = await fetch(`${API_BASE}/api/casos`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(dados)
     });
 
     if (res.ok) {
-        alert('Ocorrência cadastrada!');
+        alert('Ocorrência cadastrada com sucesso!');
         carregarDados();
+    } else {
+        alert('Erro ao cadastrar ocorrência');
     }
 }
 
 async function fazerPrevisao() {
-    const res = await fetch('http://localhost:5000/api/predizer', {
+    const res = await fetch(`${API_BASE}/api/predizer`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
